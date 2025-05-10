@@ -26,7 +26,5 @@ $(SRC_DIR)/%.o: $(SRC_DIR)/%.cpp
 make re: fclean all 
 clean:
 	rm -f $(SRC_DIR)/*.o $(TARGET)
-
-
 fclean : clean 
-	rm -rf $(BIN_DIR)
+	rm -rf

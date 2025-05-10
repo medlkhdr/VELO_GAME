@@ -4,7 +4,7 @@
 #include <iostream>
 
 MainGame::MainGame()
-: window(sf::VideoMode(1920,1080), "Bike Game", sf::Style::Default)
+: window(sf::VideoMode(1000,700), "Bike Game", sf::Style::Default)
 , gameState(MENU)
 , tileH(0.f), roadTileCount(0)
 , finishLineSpawned(false), finishTriggered(false), raceFinished(false)
@@ -424,6 +424,7 @@ void MainGame::updateGame() {
         worldSpeed, window, player->getSprite(),
         stamina, Player::MAX_STAMINA, Player::BOTTLE_STAMINA, drinkSound
     );
+    stamina -= dt * 10.f;
     player->setStamina(stamina);
 
     collectables->spawnScoreCoin(
