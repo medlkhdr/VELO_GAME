@@ -55,4 +55,4 @@ private:
     sf::Texture coinTexture;
 };
 
-#endif // COLLECTABLES_H
+#endif

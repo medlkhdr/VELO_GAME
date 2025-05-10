@@ -9,7 +9,6 @@
 
 class Player {
 public:
-    // Constants
     static constexpr float MAX_STAMINA = 5.f;
     static constexpr float BOTTLE_STAMINA = 1.f;
 
@@ -35,33 +34,29 @@ public:
     void setLives(int newLives) { lives = newLives; }
     void setStamina(float newStamina) { stamina = newStamina; }
 
-    // Invincibility API
     bool isInvincible() const;
     void startInvincibility();
 
 private:
     sf::Sprite sprite;
-    sf::Sprite shadow;        // shadow under the player
+    sf::Sprite shadow;
 
     int playerLane = 1;
-    int lives = 3;            // Number of lives
+    int lives = 3; 
     float stamina = MAX_STAMINA;
     float playerWorldSpeed = DEFAULT_SPEED;
     bool triedWhileExhausted = false;
 
-    // Invincibility state
     bool invincible = false;
     sf::Clock invincibilityClock;
-    static constexpr float INVINCIBILITY_DURATION = 2.0f; // seconds
-
-    // Movement and speed configuration
+    static constexpr float INVINCIBILITY_DURATION = 2.0f;
     static constexpr float DEFAULT_SPEED = 4.f;
     static constexpr float MAX_SPEED = 12.f;
     static constexpr float ACCEL = 0.2f;
     static constexpr float BRAKE_FORCE = 0.5f;
-    static constexpr float MIN_STAMINA_TO_BOOST = 0.5f;
-    static constexpr float STAMINA_DRAIN = 3.f;
-    static constexpr float STAMINA_REGEN = 0.5f;
+    static constexpr float MIN_STAMINA_TO_BOOST = 2.0f;
+    static constexpr float STAMINA_DRAIN = 6.f;
+    static constexpr float STAMINA_REGEN = 2.0f;
 };
 
-#endif // PLAYER_H
+#endif

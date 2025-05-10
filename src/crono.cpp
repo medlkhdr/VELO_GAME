@@ -13,7 +13,7 @@ Crono::Crono(const sf::Font& font, unsigned characterSize)
     text_.setOutlineColor(sf::Color::Black);
     text_.setOutlineThickness(2.f);
     restart();
-    DURATION = 60.f; // 60 minutes 
+    DURATION = 60.f;  
 }
 
 void Crono::restart()
@@ -21,20 +21,19 @@ void Crono::restart()
     clock_.restart();
 }
 
-void Crono::update() {
-    // nothing needed here for sf::Clock, but you could clamp or format
+void Crono::update()
+{
 }
 
-void Crono::draw(sf::RenderTarget& target) {
+void Crono::draw(sf::RenderTarget& target)
+{
     float elapsed = clock_.getElapsedTime().asSeconds();
     float remaining = std::max(0.f, DURATION - elapsed);
 
-    // Format as “SS” or “MM:SS” if you prefer
     std::ostringstream ss;
     ss << std::floor(remaining);
     text_.setString("Time: " + ss.str());
 
-    // Position it; e.g. top-right corner with a margin
     auto bounds = text_.getLocalBounds();
     sf::Vector2f pos(target.getSize().x - bounds.width - 20.f,
                      20.f);
@@ -43,11 +42,13 @@ void Crono::draw(sf::RenderTarget& target) {
     target.draw(text_);
 }
 
-bool Crono::isFinished() const {
+bool Crono::isFinished() const
+{
     return clock_.getElapsedTime().asSeconds() >= DURATION;
 }
 
-float Crono::getRemaining() const {
+float Crono::getRemaining() const
+{
     float rem = DURATION - clock_.getElapsedTime().asSeconds();
     return rem > 0.f ? rem : 0.f;
 }

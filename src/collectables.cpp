@@ -15,7 +15,7 @@ void Collectables::spawnBottle(float roadTextureWidth,
     if (std::rand() % 1000 < 5) {
         int lane = std::rand() % LANES;
         sf::Sprite b(bottleTexture);
-        b.setScale(0.23f, 0.23f);  // Adjust bottle size as needed
+        b.setScale(0.23f, 0.23f);
         float rw = roadTextureWidth;
         float roadL = (window.getSize().x - rw) / 2.f;
         float lp = padLeft * rw;
@@ -25,19 +25,16 @@ void Collectables::spawnBottle(float roadTextureWidth,
         float by = -b.getGlobalBounds().height - (std::rand() % 100);
         b.setPosition(bx, by);
 
-        // Check for overlaps with existing bottles
         for (const auto& existingBottle : bottles) {
             if (std::abs(existingBottle.getPosition().y - b.getPosition().y) < 100.f)
                 return;
         }
         
-        // Check for overlaps with obstacles
         for (const auto& obs : obstacles) {
             if (b.getGlobalBounds().intersects(obs.getGlobalBounds()))
                 return;
         }
         
-        // Check for overlaps with coins
         for (const auto& coin : coins) {
             if (b.getGlobalBounds().intersects(coin.getGlobalBounds()))
                 return;
@@ -56,7 +53,7 @@ void Collectables::spawnScoreCoin(float roadTextureWidth,
     if (std::rand() % 1000 < 4) {
         int lane = std::rand() % LANES;
         sf::Sprite c(coinTexture);
-        c.setScale(0.16f, 0.16f);  // Control the coin's size here
+        c.setScale(0.16f, 0.16f);
         float rw = roadTextureWidth;
         float roadL = (window.getSize().x - rw) / 2.f;
         float lp = padLeft * rw;
@@ -66,19 +63,16 @@ void Collectables::spawnScoreCoin(float roadTextureWidth,
         float cy = -c.getGlobalBounds().height - (std::rand() % 150);
         c.setPosition(cx, cy);
 
-        // Check for overlaps with existing coins
         for (const auto& existingCoin : coins) {
             if (std::abs(existingCoin.getPosition().y - c.getPosition().y) < 100.f)
                 return;
         }
         
-        // Check for overlaps with obstacles
         for (const auto& obs : obstacles) {
             if (c.getGlobalBounds().intersects(obs.getGlobalBounds()))
                 return;
         }
         
-        // Check for overlaps with bottles
         for (const auto& bottle : bottles) {
             if (c.getGlobalBounds().intersects(bottle.getGlobalBounds()))
                 return;

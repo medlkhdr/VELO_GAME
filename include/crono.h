@@ -1,5 +1,5 @@
-// crono.h
-#pragma once
+#ifndef CRONO_H
+#define CRONO_H
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
 
@@ -7,15 +7,13 @@ class Crono {
     private:
         sf::Clock      clock_;
         sf::Text       text_;
-        float          DURATION; // in seconds
+        float          DURATION;
     public:
         Crono(const sf::Font& font, unsigned characterSize = 24);
         void        restart();
         void        update();
         void        draw(sf::RenderTarget& target);
         bool        isFinished() const;
-   
-       // Returns how many whole seconds remain (0 … DURATION)
       float       getRemaining() const;
-
     };
+#endif 

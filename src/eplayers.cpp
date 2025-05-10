@@ -9,7 +9,6 @@ void EPlayers::spawn(float roadTextureWidth,
                      float padLeft, float padRight, int LANES,
                      sf::RenderWindow& window)
 {
-    // Spawn new obstacles with some probability (10%) if previous ones moved far enough
     if (std::rand() % 100 < 10 &&
         (obstacles.empty() || obstacles.back().getPosition().y > 150.f))
     {
@@ -40,22 +39,17 @@ bool EPlayers::update(float obstacleSpeed,
 {
     bool collided = false;
     float winH = static_cast<float>(window.getSize().y);
-
-    // Reverse direction when braking
     float speed = braking ? -obstacleSpeed : obstacleSpeed;
 
     for (auto it = obstacles.begin(); it != obstacles.end(); )
     {
-        // Move obstacle
         it->move(0, speed);
 
-        // Reduced collision boxes
         sf::FloatRect pb = player.getGlobalBounds();
         pb.left   += pb.width * 0.25f; pb.width  *= 0.5f;
         sf::FloatRect ob = it->getGlobalBounds();
         ob.left   += ob.width * 0.25f; ob.width  *= 0.5f;
 
-        // Collision?
         if (pb.intersects(ob))
         {
             crashSound.play();
@@ -63,7 +57,6 @@ bool EPlayers::update(float obstacleSpeed,
             collided = true;
             it = obstacles.erase(it);
         }
-        // Passed off bottom
         else if (it->getPosition().y > winH)
         {
             it = obstacles.erase(it);
@@ -71,7 +64,6 @@ bool EPlayers::update(float obstacleSpeed,
         }
         else
         {
-            // Draw shadow + obstacle
             sf::Sprite sh = *it;
             sh.move(5.f, 5.f);
             sh.setColor(sf::Color(0, 0, 0, 150));

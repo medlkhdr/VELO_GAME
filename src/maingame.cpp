@@ -40,7 +40,8 @@ MainGame::~MainGame() {
 
 int MainGame::run()
 {
-    while (window.isOpen()) {
+    while (window.isOpen())
+	{
         float dt = deltaClock.restart().asSeconds();
         processEvents();
         update(dt);
@@ -49,6 +50,8 @@ int MainGame::run()
     return 0;
 }
 
+sf::Texture gameOverTexture ;
+sf::Sprite gameOverSprite ;
 bool MainGame::loadAssets()
 {
     if (!font.loadFromFile("resources/fonts/Pixelite.ttf")) return false;
@@ -76,13 +79,15 @@ bool MainGame::loadAssets()
         std::string p = "resources/images/trees/tree" + std::to_string(i) + ".png";
         treeTextures[i].loadFromFile(p);
     }
-    
+    if (!gameOverTexture.loadFromFile("resources/images/gameover.png"))
+        return false;
+    gameOverSprite.setTexture(gameOverTexture);
     // Load obstacle textures
-    for (int i = 0; i < 5; ++i) {
+    for (int i = 0; i < 5; ++i)
+	{
         std::string p = "resources/images/obstacles/eplayer" + std::to_string(i+1) + ".png";
         eplayerTextures[i].loadFromFile(p);
     }
-    
     // Load collectible textures
     bottleTex.loadFromFile("resources/images/coins/bottle.png");
     coinTex.loadFromFile("resources/images/coins/score.png");
@@ -106,7 +111,9 @@ bool MainGame::loadAssets()
     coinSound.setBuffer(coinBuf);
     tiredSound.setBuffer(tiredBuf);
     finishSound.setBuffer(finishBuf);
-
+	std::cout << "Game Over Texture Size: "
+          << gameOverTexture.getSize().x << "x"
+          << gameOverTexture.getSize().y << std::endl;
     return true;
 }
 
@@ -120,21 +127,12 @@ void MainGame::setupUI() {
         shadow[i] = menu[i];
         shadow[i].setFillColor(sf::Color::Black);
     }
-    
-    // Set up stamina label
-    staminaLabel.setFont(font);
-    staminaLabel.setCharacterSize(24);
-    staminaLabel.setFillColor(sf::Color::White);
-    staminaLabel.setString("S\nT\nA\nM\nI\nN\nA");
-    staminaLabel.setLineSpacing(1.f);
 
-    // Set up position label
     positionLabel.setFont(font);
     positionLabel.setCharacterSize(24);
     positionLabel.setFillColor(sf::Color::White);
     positionLabel.setString("VOTRE POSITION :");
 
-    // Set up finish screen text
     finishTitle.setFont(font);
     finishTitle.setCharacterSize(64);
     finishTitle.setFillColor(sf::Color::Yellow);
@@ -148,7 +146,6 @@ void MainGame::setupUI() {
     returnBtn.setString("RETOUR AU MENU");
     returnBtn.setFillColor(sf::Color::White);
 
-    // Set up about screen text
     aproposTexts = {{
         "Bienvenue dans notre projet de mini-jeu de velo",
         "Realise par Mahmoud Moukouch & Mohamed Lakhdar",
@@ -176,14 +173,10 @@ void MainGame::setupUI() {
 void MainGame::rebuildRoad() {
     float winH    = static_cast<float>(window.getSize().y);
     tileH         = static_cast<float>(roadTexture.getSize().y);
-
-    // combien de tuiles pour couvrir verticalement
     roadTileCount = static_cast<int>(std::ceil(winH / tileH)) + 1;
 
-    // si la tuile est plus haute que la fenêtre, on l’aligne en y=0
     float startY = (tileH > winH ? 0.f : winH - roadTileCount * tileH);
 
-    // centre seulement si la fenêtre est plus large que la route
     float winW   = static_cast<float>(window.getSize().x);
     float rw     = static_cast<float>(roadTexture.getSize().x);
     float roadLeft = (winW > rw ? (winW - rw) * 0.5f : 0.f);
@@ -256,13 +249,12 @@ void MainGame::processEvents() {
 void MainGame::update(float dt) {
     switch (gameState) {
                 case LOADING:   updateLoading();   break;
-                case MENU:      updateMenu();      break;
+                case MENU:           break;
                 case APROPOS:   updateAPropos();   break;
                 case GAME:
                     updateGame();
                     break;
                 case HIT:
-                    // continue the world even when hit
                     updateGame();
                     updateHit();
                     break;
@@ -289,12 +281,10 @@ void MainGame::resetGame() {
     score = 0;
     distanceTraveled = 0.f;
     
-    // Clear collectables and obstacles
     collectables->clear();
     eplayers->getObstacles().clear();
     trees.clear();
     
-    // Reset player position
     player->resetPosition(roadTexture, padLeft, padRight, LANES, window);
 }
 
@@ -314,9 +304,6 @@ void MainGame::updateLoading() {
     }
 }
 
-void MainGame::updateMenu() {
-    // Menu animation/updates can be added here
-}
 
 void MainGame::updateAPropos() {
     float scrollY = window.getSize().y + 40.f
@@ -328,34 +315,27 @@ void MainGame::updateAPropos() {
 }
 
 void MainGame::updateHit() {
-    // If you’ve run out of lives, go straight back to the menu
-    if (player->getLives() <= 0) {
+    if (player->getLives() <= 0)
+	{
+        player->setLives(3);
         gameState = MENU;
         return;
     }
-
-    // Otherwise, stay in HIT until the player’s invincibility ends
     if (!player->isInvincible()) {
         gameState = GAME;
     }
 }
 
 void MainGame::updateGame() {
-    // 0) If time is up, immediately end the race
     if (crono.isFinished()) {
             clickSound.play();
-            resetGame();           // clear race state & restart crono
-            gameState = MENU;      // jump back to menu
-            return;                // skip all further game logic
+            resetGame();                       gameState = MENU;     
+            return;                
         }
-    
-        // — advance the crono internally —
     crono.update();
-    // — dt & player update —
     float dt = deltaClock.restart().asSeconds();
     player->update(dt, tiredSound);
 
-    // — Determine braking & speeds —
     bool braking    = sf::Keyboard::isKeyPressed(sf::Keyboard::S) ||
                       sf::Keyboard::isKeyPressed(sf::Keyboard::Down);
     float baseSpeed = player->getWorldSpeed();
@@ -367,7 +347,6 @@ void MainGame::updateGame() {
     float rw   = static_cast<float>(roadTexture.getSize().x);
     float roadLeft = (winW - rw) * 0.5f;
 
-    // 1) Move & wrap road tiles with worldSpeed
     for (auto& t : roadTiles) {
         t.move(0, worldSpeed);
         if (t.getPosition().y >= winH) {
@@ -377,7 +356,6 @@ void MainGame::updateGame() {
         }
     }
 
-    // 2) Spawn & move finish line with worldSpeed
     if (!finishLineSpawned && distanceTraveled >= FINISH_SPAWN_AT) {
         float scale = rw / float(finishLineTexture.getSize().x);
         finishLine.setScale(scale, scale);
@@ -397,7 +375,6 @@ void MainGame::updateGame() {
         }
     }
 
-    // 3) Trees (freeze on brake)
     if (std::rand() % 100 < 2 &&
        (trees.empty() || trees.back().getPosition().y > 200.f)) {
         sf::Sprite tr(treeTextures[1 + std::rand() % (treeTextures.size()-1)]);
@@ -419,11 +396,10 @@ void MainGame::updateGame() {
             ++it;
     }
 
-    // 4) Spawn & update e-players (use their built-in logic but pass eplayerSpeed)
     eplayers->spawn(rw, padLeft, padRight, LANES, window);
     int newLives = player->getLives();
     bool collided = eplayers->update(
-        eplayerSpeed,   // <— pass inverted speed when braking
+        eplayerSpeed,
         braking,
         window,
         player->getSprite(),
@@ -439,7 +415,6 @@ void MainGame::updateGame() {
         gameState = (player->getLives() <= 0 ? MENU : HIT);
     }
 
-    // 5) Draw collectables (they stay frozen if worldSpeed==0)
     collectables->spawnBottle(
         rw, padLeft, padRight, LANES,
         window, eplayers->getObstacles(), collectables->getCoins()
@@ -460,14 +435,12 @@ void MainGame::updateGame() {
         score, coinSound
     );
 
-    // 6) Advance distance only when not braking
     distanceTraveled += baseSpeed;
 }
 
 
 
 void MainGame::updateFinish() {
-    // Handle any post-race animations or state changes
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter)) {
         clickSound.play();
         gameState = MENU;
@@ -580,24 +553,19 @@ void MainGame::drawGame() {
         window.draw(tr);
     }
 
-    // 7) Obstacles
     for (auto& obs : eplayers->getObstacles()) {
         window.draw(obs);
     }
 
-    // 8) Bottles & coins
     for (auto& b : collectables->getBottles()) window.draw(b);
     for (auto& c : collectables->getCoins())   window.draw(c);
 
-    // 9) Player
     player->draw(window);
 
-    // 10) Stamina bar
     const float BAR_W = 20.f, BAR_H = 150.f;
-    float barX = winW - BAR_W - 20.f;
-    float barY = (winH - BAR_H) * 0.5f;
-    staminaLabel.setPosition(barX - staminaLabel.getGlobalBounds().width - 10.f,
-                             barY - staminaLabel.getCharacterSize());
+    float barX = winW - BAR_W - 60.f;
+    float barY = (winH - BAR_H) * 0.7f;
+    staminaLabel.setPosition(barX - staminaLabel.getGlobalBounds().width - 20.f, barY - staminaLabel.getCharacterSize());
     window.draw(staminaLabel);
     sf::RectangleShape bgBar({ BAR_W, BAR_H });
     bgBar.setPosition(barX, barY);
@@ -609,7 +577,6 @@ void MainGame::drawGame() {
     fgBar.setFillColor(sf::Color(100,100,255,200));
     window.draw(fgBar);
 
-    // 11) Progress bar
     const float PB_W = 300.f, PB_H = 15.f;
     float progress = std::min(1.f, distanceTraveled / RACE_DISTANCE);
     float pbX = (winW - PB_W) * 0.5f;
@@ -625,7 +592,6 @@ void MainGame::drawGame() {
     pfg.setFillColor(sf::Color(100,255,100,220));
     window.draw(pfg);
 
-    // 12) HUD Text (score & lives)
     sf::Text hud(
         "Score: " + std::to_string(score) +
         "  Lives: " + std::to_string(player->getLives()),
@@ -635,7 +601,6 @@ void MainGame::drawGame() {
     hud.setPosition(20.f, 20.f);
     window.draw(hud);
 
-    // 13) Timer next to HUD
     int secondsLeft = static_cast<int>(crono.getRemaining());
     sf::Text timeText(
         "TIME : " + std::to_string(secondsLeft),
@@ -648,7 +613,6 @@ void MainGame::drawGame() {
     timeText.setPosition(hudRight + 20.f, hud.getPosition().y);
     window.draw(timeText);
 
-    // 14) Present
     window.display();
 }
 
@@ -703,6 +667,6 @@ void MainGame::drawFinish() {
     // Draw return button
     window.draw(retSh);
     window.draw(ret);
-    
+
     window.display();
 }
