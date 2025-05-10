@@ -512,14 +512,12 @@ void MainGame::drawLoading() {
 }
 
 void MainGame::drawGame() {
-    // 1) Clear
     window.clear();
 
     float winW = static_cast<float>(window.getSize().x);
     float winH = static_cast<float>(window.getSize().y);
     float rw   = static_cast<float>(roadTexture.getSize().x);
 
-    // 2) Full-screen scrolling grass background
     static float grassOffset = 0.f;
     grassOffset = std::fmod(grassOffset - player->getWorldSpeed(),
                             static_cast<float>(grassTexture.getSize().y));
@@ -534,21 +532,17 @@ void MainGame::drawGame() {
     });
     window.draw(grassBg);
 
-    // 3) Compute roadLeft clamped ≥ 0
     float roadLeft = (winW > rw ? (winW - rw) * 0.5f : 0.f);
 
-    // 4) Draw & wrap road tiles
     for (auto& t : roadTiles) {
         t.setPosition(roadLeft, t.getPosition().y);
         window.draw(t);
     }
 
-    // 5) Finish line
     if (finishLineSpawned) {
         window.draw(finishLine);
     }
 
-    // 6) Trees
     for (auto& tr : trees) {
         window.draw(tr);
     }
@@ -556,12 +550,9 @@ void MainGame::drawGame() {
     for (auto& obs : eplayers->getObstacles()) {
         window.draw(obs);
     }
-
     for (auto& b : collectables->getBottles()) window.draw(b);
     for (auto& c : collectables->getCoins())   window.draw(c);
-
     player->draw(window);
-
     const float BAR_W = 20.f, BAR_H = 150.f;
     float barX = winW - BAR_W - 60.f;
     float barY = (winH - BAR_H) * 0.7f;
@@ -623,50 +614,38 @@ void MainGame::drawGame() {
 void MainGame::drawHit() {
     drawGame();
     
-    // Add flashing effect when hit
     static sf::Clock flashClock;
     if (static_cast<int>(flashClock.getElapsedTime().asMilliseconds() / 100) % 2 == 0) {
         sf::RectangleShape flash(sf::Vector2f(window.getSize().x, window.getSize().y));
-        flash.setFillColor(sf::Color(255, 0, 0, 100)); // Semi-transparent red
+        flash.setFillColor(sf::Color(255, 0, 0, 100));
         window.draw(flash);
     }
     
     window.display();
 }
 
-void MainGame::drawFinish() {
+void MainGame::drawFinish()
+{
     sf::Text ret = returnBtn, retSh = returnBtn;
-    
-    // Position the return button
     auto bb = ret.getLocalBounds();
     ret.setPosition(window.getSize().x/2.f - (bb.width/2.f + bb.left),
                     window.getSize().y * 0.6f + 250.f);
     retSh.setPosition(ret.getPosition() + sf::Vector2f(2, 2));
-
-    // Animate the return button
     int alpha = static_cast<int>(127.5f * (std::sin(clockPulse.getElapsedTime().asSeconds() * 2 * 3.1415f) + 1));
     ret.setFillColor(sf::Color(255, 255, 0, alpha));
     retSh.setFillColor(sf::Color(0, 0, 0, alpha));
-
     window.clear();
-
-    // Show congratulations message
     finishTitle.setString("FELICITATIONS!");
     finishTitle.setPosition(window.getSize().x/2.f - (finishTitle.getLocalBounds().width/2.f
                             + finishTitle.getLocalBounds().left),
                             window.getSize().y * 0.2f);
     window.draw(finishTitle);
-
-    // Show final score
     finishScore.setString("Votre score est " + std::to_string(score));
     finishScore.setPosition(window.getSize().x/2.f - (finishScore.getLocalBounds().width/2.f
                             + finishScore.getLocalBounds().left),
                             window.getSize().y * 0.4f + 80.f);
     window.draw(finishScore);
-
-    // Draw return button
     window.draw(retSh);
     window.draw(ret);
-
     window.display();
 }

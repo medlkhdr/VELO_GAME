@@ -13,17 +13,20 @@ TARGET    := $(BIN_DIR)/main
 
 all: $(BIN_DIR) $(TARGET)
 
-# Create bin/ if needed
 $(BIN_DIR):
 	mkdir -p $(BIN_DIR)
 
-# Link all .o into main.exe
 $(TARGET): $(OBJ)
 	$(CXX) $^ -o $@ $(LDFLAGS)
 
-# Compile .cpp to .o with debug info
 $(SRC_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
+
+make re: fclean all 
 clean:
 	rm -f $(SRC_DIR)/*.o $(TARGET)
+
+
+fclean : clean 
+	rm -rf $(BIN_DIR)
