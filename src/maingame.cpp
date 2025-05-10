@@ -25,7 +25,6 @@ MainGame::MainGame()
     setupUI();
     rebuildRoad();
 
-    // Initialize game entities
     player      = new Player(playerTexture);
     collectables = new Collectables(bottleTex, coinTex);
     eplayers = new EPlayers(eplayerTextures);
@@ -326,12 +325,14 @@ void MainGame::updateHit() {
     }
 }
 
-void MainGame::updateGame() {
-    if (crono.isFinished()) {
+void MainGame::updateGame()
+{
+    if (crono.isFinished())
+    {
             clickSound.play();
             resetGame();                       gameState = MENU;     
             return;                
-        }
+    }
     crono.update();
     float dt = deltaClock.restart().asSeconds();
     player->update(dt, tiredSound);
@@ -388,6 +389,7 @@ void MainGame::updateGame() {
         tr.setPosition(tx, -th);
         trees.push_back(tr);
     }
+    
     for (auto it = trees.begin(); it != trees.end();) {
         it->move(0, worldSpeed);
         if (it->getPosition().y > winH)
@@ -395,8 +397,8 @@ void MainGame::updateGame() {
         else
             ++it;
     }
-
     eplayers->spawn(rw, padLeft, padRight, LANES, window);
+
     int newLives = player->getLives();
     bool collided = eplayers->update(
         eplayerSpeed,
@@ -424,9 +426,12 @@ void MainGame::updateGame() {
         worldSpeed, window, player->getSprite(),
         stamina, Player::MAX_STAMINA, Player::BOTTLE_STAMINA, drinkSound
     );
-    stamina -= dt * 10.f;
+    
+    if(braking)
+    {
+        stamina -= 10.f * dt;
+    }
     player->setStamina(stamina);
-
     collectables->spawnScoreCoin(
         rw, padLeft, padRight, LANES,
         window, eplayers->getObstacles(), collectables->getBottles()
@@ -438,8 +443,6 @@ void MainGame::updateGame() {
 
     distanceTraveled += baseSpeed;
 }
-
-
 
 void MainGame::updateFinish() {
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter)) {
@@ -476,8 +479,7 @@ void MainGame::drawAPropos() {
     window.draw(bgSprite);
     float scrollY = window.getSize().y + 40.f
                     - aproposScrollClock.getElapsedTime().asSeconds() * 60.f;
-    float cx = window.getSize().x/2.f;
-    
+    float cx = window.getSize().x / 2.f;
     for (size_t i = 0; i < aproposTexts[currentTextIndex].size(); i++) {
         aproposText.setString(aproposTexts[currentTextIndex][i]);
         float px = cx - aproposText.getGlobalBounds().width/2.f,

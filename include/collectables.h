@@ -35,14 +35,12 @@ public:
                      int& score,
                      sf::Sound& coinSound);
 
-    // Overloaded getters - const and non-const versions
     std::vector<sf::Sprite>& getBottles() { return bottles; }
     const std::vector<sf::Sprite>& getBottles() const { return bottles; }
     
     std::vector<sf::Sprite>& getCoins() { return coins; }
     const std::vector<sf::Sprite>& getCoins() const { return coins; }
 
-    // Clear all collectables
     void clear() {
         bottles.clear();
         coins.clear();
